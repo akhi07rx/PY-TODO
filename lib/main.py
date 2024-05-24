@@ -160,8 +160,6 @@ class MainApp:
         self.clear_frame(app)
         self.BackgroundImage3(app)
 
-        pass
-
     def LandingPage(self):
         pass
 
