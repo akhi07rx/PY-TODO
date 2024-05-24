@@ -8,11 +8,33 @@ ctk.set_appearance_mode("dark")
 
 class MainApp:
     def __init__(self, app):
+        self.db = mysql.connector.connect(
+            host="localhost", port=4306, user="root", password="", database="py_employee")
+        self.mycursor = self.db.cursor()
+
         app.after(0, lambda: app.state('zoomed'))
         app.title("THE COMPANY PROFILE")
-        # self.HomePage(app)
+        self.HomePage(app)
         # self.Registration_Page(app)
-        self.ToDoPage(app)
+        # self.ToDoPage(app)
+
+    def check_details(self, app):
+        emp_username_entry = self.emp_username_entry
+        emp_password_entry = self.emp_password_entry
+
+        self.entered_user_id = emp_username_entry.get()
+        self.entered_password = emp_password_entry.get()
+
+        self.mycursor.execute(
+            "SELECT * FROM employee_details WHERE USERNAME = '" + self.entered_user_id+"' AND PASSWORD = '" + self.entered_password + "'")
+        self.username_check = self.mycursor.fetchone()
+
+        if self.username_check is None:
+            print("INVALID")
+            self.HomePage(app)
+        else:
+            print("SUCCESS")
+            self.ToDoPage(app)
 
     def BackgroundImage1(self, app):
         img = Image.open(
@@ -65,20 +87,21 @@ class MainApp:
         emp_username_label = ctk.CTkLabel(
             right_frame, text="Enter username", font=("0xProto", 12), text_color='black')
         emp_username_label.pack(padx=10, pady=10)
-        emp_username_entry = ctk.CTkEntry(
+        self.emp_username_entry = ctk.CTkEntry(
             right_frame, width=300, bg_color="white")
-        emp_username_entry.pack(padx=10, pady=10)
+        self.emp_username_entry.pack(padx=10, pady=10)
 
         emp_password_label = ctk.CTkLabel(
             right_frame, text="Enter Password", font=("0xProto", 12), text_color='black')
         emp_password_label.pack(padx=10, pady=10)
-        emp_password_entry = ctk.CTkEntry(
+        self.emp_password_entry = ctk.CTkEntry(
             right_frame, width=300, bg_color="white")
-        emp_password_entry.pack(padx=10, pady=10)
+        self.emp_password_entry.pack(padx=10, pady=10)
 
-        signin_button = ctk.CTkButton(
-            right_frame, text="LOG IN", font=("0xProto", 12), command=lambda: self.ToDoPage(app))
-        signin_button.place(x=130, y=280)
+        login_button = ctk.CTkButton(right_frame, text="LOG IN", font=(
+            "0xProto", 12), command=lambda: self.check_details(app))
+
+        login_button.place(x=130, y=280)
 
         signup_button = ctk.CTkButton(right_frame, text="SIGN UP", font=(
             "0xProto", 12), command=lambda: self.Registration_Page(app))
@@ -124,62 +147,39 @@ class MainApp:
         self.emp_employee_password.place(relx=0.7, rely=0.55, anchor="center")
 
         signup_button = ctk.CTkButton(frame, text="SIGN UP", font=(
-            "0xProto", 12), command=lambda: self.Registration_Page(app))
+            "0xProto", 12), command=lambda: self.registration_helper(app))
         signup_button.place(relx=0.50, rely=0.75, anchor="center")
 
-        signup_button = ctk.CTkButton(frame, text="HOME", font=(
+        home_button = ctk.CTkButton(frame, text="HOME", font=(
             "0xProto", 12), command=lambda: self.HomePage(app))
-        signup_button.place(relx=0.50, rely=0.85, anchor="center")
+        home_button.place(relx=0.50, rely=0.85, anchor="center")
 
-        # name,id,username,password
+    # name,id,username,password
 
     def ToDoPage(self, app):
         self.clear_frame(app)
         self.BackgroundImage3(app)
 
-        frame = Frame(app, bg="BLACK")
-        frame.place(relx=0.5, rely=0.5, anchor="center", height=700, width=700)
-
-        label = Label(frame, text="EMPLOYEE REGISTRATION FORM",
-                      font=("0xProto", 24), bg="BLACK", fg="WHITE")
-        label.place(relx=0.5, rely=0.1, anchor="center")
-
-        name_label = Label(frame, text="EMPLOYEE NAME", font=(
-            "0xProto", 16), bg="BLACK", fg="WHITE")
-        name_label.place(relx=0.3, rely=0.25, anchor="center")
-        self.emp_name = Entry(frame, width=14, font=("0xProto", 14))
-        self.emp_name.place(relx=0.7, rely=0.25, anchor="center")
-
-        employee_id_label = Label(frame, text="EMPLOYEE ID", font=(
-            "0xProto", 16), bg="BLACK", fg="WHITE")
-        employee_id_label.place(relx=0.3, rely=0.35, anchor="center")
-        self.emp_employee_id = Entry(frame, width=14, font=("0xProto", 14))
-        self.emp_employee_id.place(relx=0.7, rely=0.35, anchor="center")
-
-        employee_username_label = Label(frame, text="EMPLOYEE USERNAME", font=(
-            "0xProto", 16), bg="BLACK", fg="WHITE")
-        employee_username_label.place(relx=0.3, rely=0.45, anchor="center")
-        self.emp_employee_username = Entry(
-            frame, width=14, font=("0xProto", 14))
-        self.emp_employee_username.place(relx=0.7, rely=0.45, anchor="center")
-
-        employee_password_label = Label(frame, text="EMPLOYEE PASSWORD", font=(
-            "0xProto", 16), bg="BLACK", fg="WHITE")
-        employee_password_label.place(relx=0.3, rely=0.55, anchor="center")
-        self.emp_employee_password = Entry(
-            frame, width=14, font=("0xProto", 14))
-        self.emp_employee_password.place(relx=0.7, rely=0.55, anchor="center")
-
-        signup_button = ctk.CTkButton(frame, text="SIGN UP", font=(
-            "0xProto", 12), command=lambda: self.Registration_Page(app))
-        signup_button.place(relx=0.50, rely=0.75, anchor="center")
-
-        signup_button = ctk.CTkButton(frame, text="HOME", font=(
-            "0xProto", 12), command=lambda: self.HomePage(app))
-        signup_button.place(relx=0.50, rely=0.85, anchor="center")
+        pass
 
     def LandingPage(self):
         pass
+
+    def registration_helper(self, app):
+        self.employee_name = self.emp_name.get()
+        self.employee_id = self.emp_employee_id.get()
+        self.username = self.emp_employee_username.get()
+        self.password = self.emp_employee_password.get()
+
+        print(self.employee_name, self.employee_id,
+              self.username, self.password)
+
+        self.mycursor.execute(
+            'INSERT INTO employee_details (`EMPLOYEE_NAME`, `EMPLOYEE_ID`, `USERNAME`, `PASSWORD`) VALUES(%s,%s,%s,%s)', (self.employee_name, self.employee_id, self.username, self.password))
+
+        self.db.commit()
+        print("\nSUCCESS ADDED TO DB\n")
+        self.Registration_Page(app)
 
     def load_img(self, frame):
         self.original_img = Image.open(
