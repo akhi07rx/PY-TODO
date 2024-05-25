@@ -36,33 +36,6 @@ class MainApp:
             print("SUCCESS")
             self.ToDoPage(app)
 
-    def BackgroundImage1(self, app):
-        img = Image.open(
-            "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//main_bg.png")
-        img = img.resize((1920, 1080))
-        img = ctk.CTkImage(light_image=img, size=(1920, 1080))
-        im = ctk.CTkLabel(app, image=img, text="")
-        im.image = img
-        im.place(x=0, y=0)
-
-    def BackgroundImage2(self, app):
-        img = Image.open(
-            "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//trekking.png")
-        img = img.resize((1920, 1080))
-        img = ctk.CTkImage(light_image=img, size=(1920, 1080))
-        im = ctk.CTkLabel(app, image=img, text="")
-        im.image = img
-        im.place(x=0, y=0)
-
-    def BackgroundImage3(self, app):
-        img = Image.open(
-            "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//dehr.jpg")
-        img = img.resize((1920, 1080))
-        img = ctk.CTkImage(light_image=img, size=(1920, 1080))
-        im = ctk.CTkLabel(app, image=img, text="")
-        im.image = img
-        im.place(x=0, y=0)
-
     def HomePage(self, app):
         self.clear_frame(app)
         self.BackgroundImage1(app)
@@ -191,6 +164,33 @@ class MainApp:
         self.img_label = Label(frame, image=self.tk_img, borderwidth=0)
         self.img_label.place(relx=0, rely=0, relwidth=1, relheight=1)
         self.img_label.image = self.tk_img
+
+    def BackgroundImage1(self, app):
+        img = Image.open(
+            "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//main_bg.png")
+        img = img.resize((1920, 1080))
+        img = ctk.CTkImage(light_image=img, size=(1920, 1080))
+        im = ctk.CTkLabel(app, image=img, text="")
+        im.image = img
+        im.place(x=0, y=0)
+
+    def BackgroundImage2(self, app):
+        img = Image.open(
+            "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//trekking.png")
+        img = img.resize((1920, 1080))
+        img = ctk.CTkImage(light_image=img, size=(1920, 1080))
+        im = ctk.CTkLabel(app, image=img, text="")
+        im.image = img
+        im.place(x=0, y=0)
+
+    def BackgroundImage3(self, app):
+        img = Image.open(
+            "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//dehr.jpg")
+        img = img.resize((1920, 1080))
+        img = ctk.CTkImage(light_image=img, size=(1920, 1080))
+        im = ctk.CTkLabel(app, image=img, text="")
+        im.image = img
+        im.place(x=0, y=0)
 
     def clear_frame(self, app):
         for widget in app.winfo_children():
