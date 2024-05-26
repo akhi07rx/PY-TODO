@@ -30,10 +30,10 @@ class MainApp:
         self.username_check = self.mycursor.fetchone()
 
         if self.username_check is None:
-            print("INVALID")
+            print("WRONG USERID OR PASSWORD")
             self.HomePage(app)
         else:
-            print("SUCCESS")
+            print("LOGIN SUCCESSFUL\n")
             self.ToDoPage(app)
 
     def HomePage(self, app):
@@ -116,7 +116,7 @@ class MainApp:
             "0xProto", 16), bg="BLACK", fg="WHITE")
         employee_password_label.place(relx=0.3, rely=0.55, anchor="center")
         self.emp_employee_password = Entry(
-            frame, width=14, font=("0xProto", 14))
+            frame, width=14, font=("0xProto", 14), show="*")
         self.emp_employee_password.place(relx=0.7, rely=0.55, anchor="center")
 
         signup_button = ctk.CTkButton(frame, text="SIGN UP", font=(
@@ -132,6 +132,22 @@ class MainApp:
     def ToDoPage(self, app):
         self.clear_frame(app)
         self.BackgroundImage3(app)
+
+        frame = Frame(app, bg="BLACK")
+        frame.place(relx=0.5, rely=0.5, anchor="center", height=700, width=700)
+
+        label = Label(frame, text="TODO LIST",
+                      font=("0xProto", 24), bg="BLACK", fg="WHITE")
+        label.place(relx=0.5, rely=0.1, anchor="center")
+
+        todo_entry = ctk.CTkEntry(
+            master=frame, width=200, height=30, corner_radius=2)
+        todo_entry.pack(padx=10, pady=100)
+
+        check_var = StringVar(value="off")
+        checkbox = ctk.CTkCheckBox(master=frame, text="TEST",
+                                   variable=check_var, onvalue="on", offvalue="off")
+        checkbox.pack(padx=20, pady=100)
 
     def LandingPage(self):
         pass
