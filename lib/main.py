@@ -133,21 +133,56 @@ class MainApp:
         self.clear_frame(app)
         self.BackgroundImage3(app)
 
-        frame = Frame(app, bg="BLACK")
-        frame.place(relx=0.5, rely=0.5, anchor="center", height=700, width=700)
+        self.frame = ctk.CTkFrame(app, fg_color="black",
+                                  width=700, height=700, corner_radius=8)
+        self.frame.place(relx=0.5, rely=0.5, anchor="center")
+        self.frame.pack_propagate(False)
 
-        label = Label(frame, text="TODO LIST",
+        label = Label(self.frame, text="TODO LIST",
                       font=("0xProto", 24), bg="BLACK", fg="WHITE")
-        label.place(relx=0.5, rely=0.1, anchor="center")
+        label.place(relx=0.5, rely=0.06, anchor="center")
 
-        todo_entry = ctk.CTkEntry(
-            master=frame, width=200, height=30, corner_radius=2)
-        todo_entry.pack(padx=10, pady=100)
+        entry_frame = ctk.CTkFrame(
+            self.frame, fg_color="black", corner_radius=0)
+        entry_frame.pack(pady=90)
 
-        check_var = StringVar(value="off")
-        checkbox = ctk.CTkCheckBox(master=frame, text="TEST",
-                                   variable=check_var, onvalue="on", offvalue="off")
-        checkbox.pack(padx=20, pady=100)
+        self.todo_entry = ctk.CTkEntry(
+            master=entry_frame, width=250, height=30, corner_radius=6)
+        self.todo_entry.pack(side="left", padx=(0, 10))
+
+        submit = ctk.CTkButton(entry_frame, text="SUBMIT",
+                               command=self.submit_todo)
+        submit.pack(side="left")
+
+        self.todo_frame = ctk.CTkFrame(self.frame, fg_color="black",
+                                       width=650, height=400, corner_radius=8)
+        self.todo_frame.pack(pady=20)
+
+        # check_var = StringVar(value="off")
+        # checkbox = ctk.CTkCheckBox(master=self.frame, text="TEST",
+        #                            variable=check_var, onvalue="on", offvalue="off")
+        # checkbox.pack(padx=20, pady=100)
+
+        home_button = ctk.CTkButton(self.frame, text="HOME", font=(
+            "0xProto", 12), command=lambda: self.HomePage(app))
+        home_button.pack(side="bottom", padx=10)
+
+    def submit_todo(self):
+        todo = self.todo_entry.get()
+        print(todo)
+
+        if todo:
+            todo_check_value = ctk.BooleanVar()
+            todo_checkbox = ctk.CTkCheckBox(
+                self.todo_frame, text=todo, variable=todo_check_value,
+                font=("0xProto", 15), command=lambda: self.on_check(todo_check_value, todo_checkbox))
+            todo_checkbox.pack(anchor='w', padx=10, pady=5)
+            self.todo_entry.delete(0, END)
+
+    def on_check(self, var, checkbox):
+        if var.get() == 1:
+            checkbox.destroy()
+            print("\nDELETED TASK: ", checkbox.cget("text"))
 
     def LandingPage(self):
         pass
