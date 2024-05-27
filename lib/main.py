@@ -8,6 +8,7 @@ ctk.set_appearance_mode("dark")
 
 class MainApp:
     def __init__(self, app):
+        self.emp_employee_username = ""
         self.db = mysql.connector.connect(
             host="localhost", port=4306, user="root", password="", database="py_employee")
         self.mycursor = self.db.cursor()
@@ -127,9 +128,8 @@ class MainApp:
             "0xProto", 12), command=lambda: self.HomePage(app))
         home_button.place(relx=0.50, rely=0.85, anchor="center")
 
-    # name,id,username,password
-
     def ToDoPage(self, app):
+
         self.clear_frame(app)
         self.BackgroundImage3(app)
 
@@ -154,24 +154,33 @@ class MainApp:
                                command=self.submit_todo)
         submit.pack(side="left")
 
+        self.toto_store()
+
         self.todo_frame = ctk.CTkFrame(self.frame, fg_color="black",
                                        width=650, height=400, corner_radius=8)
         self.todo_frame.pack(pady=20)
 
-        # check_var = StringVar(value="off")
-        # checkbox = ctk.CTkCheckBox(master=self.frame, text="TEST",
-        #                            variable=check_var, onvalue="on", offvalue="off")
-        # checkbox.pack(padx=20, pady=100)
-
         home_button = ctk.CTkButton(self.frame, text="HOME", font=(
             "0xProto", 12), command=lambda: self.HomePage(app))
         home_button.pack(side="bottom", padx=10)
+
+    def toto_store(self):
+
+        self.todo = self.todo_entry.get()
+
+        self.mycursor_todo.execute(
+            'INSERT INTO `employee_todo_list`(`USERNAME`, `TODO_TASKS`) VALUES(%s,%s)', (self.username, self.todo_entry))
+
+        self.db.commit()
+        print("000")
 
     def submit_todo(self):
         todo = self.todo_entry.get()
         print(todo)
 
         if todo:
+            self.toto_store()
+
             todo_check_value = ctk.BooleanVar()
             todo_checkbox = ctk.CTkCheckBox(
                 self.todo_frame, text=todo, variable=todo_check_value,
@@ -181,8 +190,39 @@ class MainApp:
 
     def on_check(self, var, checkbox):
         if var.get() == 1:
+            task = checkbox.cget("text")
+            self.mycursor.execute(
+                "DELETE FROM employee_todo_list WHERE USERNAME = %s AND TODO_TASKS = %s", (self.username_check[2], task))
+            self.db.commit()
             checkbox.destroy()
-            print("\nDELETED TASK: ", checkbox.cget("text"))
+            print("\nDELETED TASK: ", task)
+
+    def toto_store(self):
+
+        username = self.username_check[2]
+        print(username)
+        self.todo = self.todo_entry.get()
+
+        self.mycursor.execute(
+            'INSERT INTO employee_todo_list (`USERNAME`, `TODO_TASKS`) VALUES (%s, %s)', (username, self.todo))
+
+        self.db.commit()
+        print("TASK ADDED TO DB")
+
+    def todo_check(self):
+        username = self.username_check[2]
+        self.mycursor.execute(
+            'INSERT INTO employee_todo_list (`USERNAME`, `TODO_TASKS`) VALUES (%s, %s)', (username, self.todo))
+
+        todo_tasks = self.mycursor.fetchall
+
+        for todo_task in todo_tasks:
+            todo_check_value = ctk.BooleanVar()
+            todo_checkbox = ctk.CTkCheckBox(
+                self.todo_frame, text=todo, variable=todo_check_value,
+                font=("0xProto", 15), command=lambda: self.on_check(todo_check_value, todo_checkbox))
+            todo_checkbox.pack(anchor='w', padx=10, pady=5)
+            self.todo_entry.delete(0, END)
 
     def LandingPage(self):
         pass
