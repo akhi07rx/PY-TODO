@@ -16,8 +16,6 @@ class MainApp:
         app.after(0, lambda: app.state('zoomed'))
         app.title("THE COMPANY PROFILE")
         self.HomePage(app)
-        # self.Registration_Page(app)
-        # self.ToDoPage(app)
 
     def check_details(self, app):
         emp_username_entry = self.emp_username_entry
@@ -27,7 +25,8 @@ class MainApp:
         self.entered_password = emp_password_entry.get()
 
         self.mycursor.execute(
-            "SELECT * FROM employee_details WHERE USERNAME = '" + self.entered_user_id+"' AND PASSWORD = '" + self.entered_password + "'")
+            "SELECT * FROM employee_details WHERE USERNAME = %s AND PASSWORD = %s",
+            (self.entered_user_id, self.entered_password))
         self.username_check = self.mycursor.fetchone()
 
         if self.username_check is None:
@@ -39,7 +38,8 @@ class MainApp:
 
     def HomePage(self, app):
         self.clear_frame(app)
-        self.BackgroundImage1(app)
+        self.set_background_image(
+            app, "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//main_bg.png")
 
         main_frame = ctk.CTkFrame(app, fg_color="white")
         main_frame.place(relx=0.5, rely=0.5, anchor="center",
@@ -69,7 +69,7 @@ class MainApp:
             right_frame, text="Enter Password", font=("0xProto", 12), text_color='black')
         emp_password_label.pack(padx=10, pady=10)
         self.emp_password_entry = ctk.CTkEntry(
-            right_frame, width=300, bg_color="white")
+            right_frame, width=300, bg_color="white", show="*")
         self.emp_password_entry.pack(padx=10, pady=10)
 
         login_button = ctk.CTkButton(right_frame, text="LOG IN", font=(
@@ -85,7 +85,8 @@ class MainApp:
 
     def Registration_Page(self, app):
         self.clear_frame(app)
-        self.BackgroundImage2(app)
+        self.set_background_image(
+            app, "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//trekking.png")
 
         frame = Frame(app, bg="BLACK")
         frame.place(relx=0.5, rely=0.5, anchor="center", height=700, width=700)
@@ -129,9 +130,9 @@ class MainApp:
         home_button.place(relx=0.50, rely=0.85, anchor="center")
 
     def ToDoPage(self, app):
-
         self.clear_frame(app)
-        self.BackgroundImage3(app)
+        self.set_background_image(
+            app, "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//dehr.jpg")
 
         self.frame = ctk.CTkFrame(app, fg_color="black",
                                   width=700, height=700, corner_radius=8)
@@ -154,7 +155,7 @@ class MainApp:
                                command=self.submit_todo)
         submit.pack(side="left")
 
-        self.toto_store()
+        self.todo_entry.bind('<Return>', self.submit_todo)
 
         self.todo_frame = ctk.CTkFrame(self.frame, fg_color="black",
                                        width=650, height=400, corner_radius=8)
@@ -164,68 +165,58 @@ class MainApp:
             "0xProto", 12), command=lambda: self.HomePage(app))
         home_button.pack(side="bottom", padx=10)
 
-    def toto_store(self):
+        self.todo_view()
 
-        self.todo = self.todo_entry.get()
-
-        self.mycursor_todo.execute(
-            'INSERT INTO `employee_todo_list`(`USERNAME`, `TODO_TASKS`) VALUES(%s,%s)', (self.username, self.todo_entry))
-
-        self.db.commit()
-        print("000")
-
-    def submit_todo(self):
+    def submit_todo(self, event=None):
         todo = self.todo_entry.get()
         print(todo)
 
         if todo:
             self.toto_store()
 
-            todo_check_value = ctk.BooleanVar()
-            todo_checkbox = ctk.CTkCheckBox(
-                self.todo_frame, text=todo, variable=todo_check_value,
-                font=("0xProto", 15), command=lambda: self.on_check(todo_check_value, todo_checkbox))
-            todo_checkbox.pack(anchor='w', padx=10, pady=5)
+            self.add_todo_checkbox(todo)
             self.todo_entry.delete(0, END)
 
-    def on_check(self, var, checkbox):
+    def add_todo_checkbox(self, task_text):
+        todo_check_value = ctk.BooleanVar()
+        todo_checkbox = ctk.CTkCheckBox(
+            self.todo_frame, text=task_text, variable=todo_check_value,
+            font=("0xProto", 15), command=lambda: self.on_check(todo_check_value, todo_checkbox, task_text))
+        todo_checkbox.pack(anchor='w', padx=10, pady=5)
+
+    def on_check(self, var, checkbox, task):
         if var.get() == 1:
-            task = checkbox.cget("text")
             self.mycursor.execute(
-                "DELETE FROM employee_todo_list WHERE USERNAME = %s AND TODO_TASKS = %s", (self.username_check[2], task))
+                "DELETE FROM employee_todo_list WHERE USERNAME = %s AND TODO_TASKS = %s",
+                (self.username_check[2], task))
             self.db.commit()
             checkbox.destroy()
             print("\nDELETED TASK: ", task)
 
     def toto_store(self):
-
         username = self.username_check[2]
-        print(username)
         self.todo = self.todo_entry.get()
 
         self.mycursor.execute(
-            'INSERT INTO employee_todo_list (`USERNAME`, `TODO_TASKS`) VALUES (%s, %s)', (username, self.todo))
+            'INSERT INTO employee_todo_list (`USERNAME`, `TODO_TASKS`) VALUES (%s, %s)',
+            (username, self.todo))
 
         self.db.commit()
         print("TASK ADDED TO DB")
 
-    def todo_check(self):
+    def todo_view(self):
         username = self.username_check[2]
         self.mycursor.execute(
-            'INSERT INTO employee_todo_list (`USERNAME`, `TODO_TASKS`) VALUES (%s, %s)', (username, self.todo))
+            'SELECT TODO_TASKS FROM employee_todo_list WHERE USERNAME = %s', (
+                username,)
+        )
 
-        todo_tasks = self.mycursor.fetchall
+        todo_tasks_view = self.mycursor.fetchall()
+        print(todo_tasks_view)
 
-        for todo_task in todo_tasks:
-            todo_check_value = ctk.BooleanVar()
-            todo_checkbox = ctk.CTkCheckBox(
-                self.todo_frame, text=todo, variable=todo_check_value,
-                font=("0xProto", 15), command=lambda: self.on_check(todo_check_value, todo_checkbox))
-            todo_checkbox.pack(anchor='w', padx=10, pady=5)
-            self.todo_entry.delete(0, END)
-
-    def LandingPage(self):
-        pass
+        for todo_task in todo_tasks_view:
+            task_text = todo_task[0]
+            self.add_todo_checkbox(task_text)
 
     def registration_helper(self, app):
         self.employee_name = self.emp_name.get()
@@ -237,7 +228,8 @@ class MainApp:
               self.username, self.password)
 
         self.mycursor.execute(
-            'INSERT INTO employee_details (`EMPLOYEE_NAME`, `EMPLOYEE_ID`, `USERNAME`, `PASSWORD`) VALUES(%s,%s,%s,%s)', (self.employee_name, self.employee_id, self.username, self.password))
+            'INSERT INTO employee_details (`EMPLOYEE_NAME`, `EMPLOYEE_ID`, `USERNAME`, `PASSWORD`) VALUES(%s,%s,%s,%s)',
+            (self.employee_name, self.employee_id, self.username, self.password))
 
         self.db.commit()
         print("\nSUCCESS ADDED TO DB\n")
@@ -256,27 +248,8 @@ class MainApp:
         self.img_label.place(relx=0, rely=0, relwidth=1, relheight=1)
         self.img_label.image = self.tk_img
 
-    def BackgroundImage1(self, app):
-        img = Image.open(
-            "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//main_bg.png")
-        img = img.resize((1920, 1080))
-        img = ctk.CTkImage(light_image=img, size=(1920, 1080))
-        im = ctk.CTkLabel(app, image=img, text="")
-        im.image = img
-        im.place(x=0, y=0)
-
-    def BackgroundImage2(self, app):
-        img = Image.open(
-            "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//trekking.png")
-        img = img.resize((1920, 1080))
-        img = ctk.CTkImage(light_image=img, size=(1920, 1080))
-        im = ctk.CTkLabel(app, image=img, text="")
-        im.image = img
-        im.place(x=0, y=0)
-
-    def BackgroundImage3(self, app):
-        img = Image.open(
-            "C://Users//AKHI//Desktop//PYTHON WORKS//PY TODO//assets//images//dehr.jpg")
+    def set_background_image(self, app, img_path):
+        img = Image.open(img_path)
         img = img.resize((1920, 1080))
         img = ctk.CTkImage(light_image=img, size=(1920, 1080))
         im = ctk.CTkLabel(app, image=img, text="")
